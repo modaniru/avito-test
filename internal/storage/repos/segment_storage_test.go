@@ -48,6 +48,24 @@ func TestDeleteSegment(t *testing.T) {
 	}
 }
 
+func TestCheckFollowsAfterDeleteSegment(t *testing.T) {
+	userStorage := NewUserStorage(db)
+	segmentStorage := NewSegmentStorage(db)
+	defer clearDB()
+
+	insertUsers(userStorage, t)
+	insertSegments(segmentStorage, t)
+
+	segments := []string{"AVITO_VOICE_MESSAGES", "AVITO_PERFORMANCE_VAS"}
+	err := userStorage.FollowToSegments(context.Background(), 1, segments)
+	require.NoError(t, err)
+	err = segmentStorage.DeleteSegment(context.Background(), "AVITO_PERFORMANCE_VAS")
+	require.NoError(t, err)
+	list, err := userStorage.GetUserSegments(context.Background(), 1)
+	require.Len(t, list, 1)
+	require.Equal(t, "AVITO_PERFORMANCE_VAS", list[0].Name)
+}
+
 func insertSegments(storage *SegmentStorage, t *testing.T) {
 	segments := []string{"AVITO_VOICE_MESSAGES", "AVITO_PERFORMANCE_VAS", "AVITO_DISCOUNT_30", "AVITO_DISCOUNT_50"}
 	for _, segment := range segments {

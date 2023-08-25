@@ -21,17 +21,12 @@ var db *sql.DB
 // TODO fabric db
 func TestMain(m *testing.M) {
 	createTables()
-	defer func() {
-		for _, t := range tables {
-			_, err := db.Exec(fmt.Sprintf("drop table %s;", t))
-			if err != nil {
-				log.Fatal(err.Error())
-			}
-		}
-	}()
 	code := m.Run()
-	if code == 0 {
-		return
+	for _, t := range tables {
+		_, err := db.Exec(fmt.Sprintf("drop table %s;", t))
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 	}
 	os.Exit(code)
 }
@@ -63,10 +58,12 @@ func createTables() {
 	);
 	
 	create table follows(
-		user_id integer not null references users (id) on delete cascade,
-		segment_name varchar not null references segments (name) on delete cascade,
+		user_id integer not null,
+		segment_id varchar not null,
 		expire timestamp default CURRENT_TIMESTAMP,
-		unique (user_id, segment_name)
+		unique (user_id, segment_id),
+		foreign key (user_id) references users (id) on delete cascade,
+		foreign key (segment_id) references segments (id) on delete cascade
 	);`
 
 	_, err = sqlite.Exec(query)
