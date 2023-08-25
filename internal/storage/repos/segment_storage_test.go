@@ -63,7 +63,7 @@ func TestCheckFollowsAfterDeleteSegment(t *testing.T) {
 	require.NoError(t, err)
 	list, err := userStorage.GetUserSegments(context.Background(), 1)
 	require.Len(t, list, 1)
-	require.Equal(t, "AVITO_PERFORMANCE_VAS", list[0].Name)
+	require.Equal(t, "AVITO_VOICE_MESSAGES", list[0].Name)
 }
 
 func insertSegments(storage *SegmentStorage, t *testing.T) {

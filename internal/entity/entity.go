@@ -7,7 +7,7 @@ type Segment struct {
 
 type History struct {
 	UserId        int
-	Segment_name  string
+	SegmentName   string
 	Operation     string
 	OperationTime string
 }

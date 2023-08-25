@@ -52,7 +52,7 @@ func createTables() {
 		user_id integer not null,
 		segment_name varchar not null,
 		operation varchar not null,
-		operationTime timestamp default CURRENT_TIMESTAMP,
+		operation_time timestamp default CURRENT_TIMESTAMP,
 		foreign key (user_id) references users(id),
 		foreign key (segment_name) references segments(name)
 	);
