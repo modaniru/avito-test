@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"github.com/modaniru/avito/internal/app"
+)
 
 func main() {
-	fmt.Println("Hello world!")
+	app.App()
 }

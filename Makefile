@@ -1,5 +1,5 @@
 .PHONY: run
-run: test
+run: fmt
 	go run cmd/main.go
 
 .PHONY: fmt
