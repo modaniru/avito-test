@@ -14,7 +14,6 @@ create table history(
 	operation varchar not null,
 	operation_time timestamp default CURRENT_TIMESTAMP,
 	foreign key (user_id) references users(id),
-	foreign key (segment_name) references segments(name)
 );
 	
 create table follows(

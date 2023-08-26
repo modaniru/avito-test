@@ -24,6 +24,7 @@ func NewUserRouter(userService service.User) chi.Router {
 	r.Post("/", u.SaveUser)
 	r.Delete("/", u.DeleteUser)
 	r.Get("/all", u.GetUsers)
+	r.Mount("/segments", NewFollowRouter(userService))
 	return r
 }
 

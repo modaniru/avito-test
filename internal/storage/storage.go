@@ -39,34 +39,32 @@ type Storage struct {
 
 func NewStorage(db *sql.DB) *Storage {
 	_, err := db.Exec(`
-	create table if not exists users (
+	create table if not exists users(
 		id integer primary key not null
 	);
 		
-	create table if not exists segments (
+	create table if not exists segments(
 		id serial primary key,
 		name varchar not null unique
 	);
 		
-	create table if not exists history (
+	create table if not exists history(
 		id serial primary key,
 		user_id integer not null,
 		segment_name varchar not null,
 		operation varchar not null,
 		operation_time timestamp default now(),
-		foreign key (user_id) references users(id),
-		foreign key (segment_name) references segments(name)
+		foreign key (user_id) references users(id)
 	);
 		
-	create table if not exists follows (
+	create table if not exists follows(
 		user_id integer not null,
 		segment_id integer not null,
 		expire timestamp default null,
 		unique (user_id, segment_id),
 		foreign key (user_id) references users (id) on delete cascade,
 		foreign key (segment_id) references segments (id) on delete cascade
-	);
-	`)
+	);`)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

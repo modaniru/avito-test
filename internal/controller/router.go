@@ -12,6 +12,7 @@ import (
 func NewRouter(r chi.Router, service *service.Service) {
 	r.Mount("/user", NewUserRouter(service.User))
 	r.Mount("/segment", NewSegmentRouter(service.Segment))
+	r.Mount("/history", NewHistoryRouter(service.History))
 }
 
 type ErrorResponse struct {

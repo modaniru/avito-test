@@ -6,10 +6,10 @@ type Segment struct {
 }
 
 type History struct {
-	UserId        int
-	SegmentName   string
-	Operation     string
-	OperationTime string
+	UserId        int    `json:"user_id"`
+	SegmentName   string `json:"segment_name"`
+	Operation     string `json:"operation"`
+	OperationTime string `json:"operation_time"`
 }
 
 type User struct {
