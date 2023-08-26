@@ -3,9 +3,14 @@ package repos
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/modaniru/avito/internal/entity"
+)
+
+var (
+	ErrSegmentNotFound = errors.New("segment was not found")
 )
 
 type SegmentStorage struct {
@@ -28,6 +33,7 @@ func (s *SegmentStorage) SaveSegment(ctx context.Context, name string) (int, err
 
 	return id, nil
 }
+
 func (s *SegmentStorage) GetSegments(ctx context.Context) ([]entity.Segment, error) {
 	op := "internal.storage.repos.SegmentStorage.GetSegments"
 	query := "select id, name from segments;"
@@ -51,12 +57,17 @@ func (s *SegmentStorage) GetSegments(ctx context.Context) ([]entity.Segment, err
 	return segments, nil
 }
 
+// TODO test segment not found
 func (s *SegmentStorage) DeleteSegment(ctx context.Context, name string) error {
 	op := "internal.storage.repos.SegmentStorage.DeleteSegment"
-	query := "delete from segments where name = $1;"
+	query := "delete from segments where name = $1 returning id;"
 
-	_, err := s.db.ExecContext(ctx, query, name)
+	var id int
+	err := s.db.QueryRowContext(ctx, query, name).Scan(&id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrSegmentNotFound
+		}
 		return fmt.Errorf("%s exec error: %w", op, err)
 	}
 
