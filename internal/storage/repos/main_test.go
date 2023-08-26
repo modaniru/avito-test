@@ -52,8 +52,7 @@ func createTables() {
 			user_id integer not null,
 			segment_name varchar not null,
 			operation varchar not null,
-			operation_time timestamp default CURRENT_TIMESTAMP,
-			foreign key (user_id) references users(id)
+			operation_time timestamp default CURRENT_TIMESTAMP
 		);
 			
 		create table follows(

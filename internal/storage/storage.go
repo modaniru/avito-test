@@ -53,8 +53,7 @@ func NewStorage(db *sql.DB) *Storage {
 		user_id integer not null,
 		segment_name varchar not null,
 		operation varchar not null,
-		operation_time timestamp default now(),
-		foreign key (user_id) references users(id)
+		operation_time timestamp default now()
 	);
 		
 	create table if not exists follows(

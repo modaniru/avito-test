@@ -10,6 +10,7 @@ import (
 )
 
 func NewRouter(r chi.Router, service *service.Service) {
+	r.Use(LoggingMiddleware)
 	r.Mount("/user", NewUserRouter(service.User))
 	r.Mount("/segment", NewSegmentRouter(service.Segment))
 	r.Mount("/history", NewHistoryRouter(service.History))
