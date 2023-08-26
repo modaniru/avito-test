@@ -75,9 +75,28 @@ func (u *UserStorage) GetUsers(ctx context.Context) ([]entity.User, error) {
 func (u *UserStorage) DeleteUser(ctx context.Context, userId int) error {
 	op := "internal.storage.repos.UserStorage.DeleteUser"
 	query := "delete from users where id = $1 returning id;"
+	saveHistoryQuery := "insert into history (user_id, segment_name, operation) values ($1, $2, $3)"
+
+	segments, err := u.GetUserSegments(ctx, userId)
+	if err != nil {
+		return fmt.Errorf("%s get user segments error: %w", op, err)
+	}
+
+	tx, err := u.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("%s begin tx error: %w", op, err)
+	}
+	defer tx.Rollback()
+
+	for _, segment := range segments {
+		_, err := tx.ExecContext(ctx, saveHistoryQuery, userId, segment.Name, UnFollowOperation)
+		if err != nil {
+			return fmt.Errorf("%s exec error: %w", op, err)
+		}
+	}
 
 	var id int
-	err := u.db.QueryRowContext(ctx, query, userId).Scan(&id)
+	err = tx.QueryRowContext(ctx, query, userId).Scan(&id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return ErrUserNotFound
@@ -85,6 +104,7 @@ func (u *UserStorage) DeleteUser(ctx context.Context, userId int) error {
 		return fmt.Errorf("%s exec error: %w", op, err)
 	}
 
+	tx.Commit()
 	return nil
 }
 

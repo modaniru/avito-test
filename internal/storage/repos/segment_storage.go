@@ -68,15 +68,45 @@ func (s *SegmentStorage) GetSegments(ctx context.Context) ([]entity.Segment, err
 func (s *SegmentStorage) DeleteSegment(ctx context.Context, name string) error {
 	op := "internal.storage.repos.SegmentStorage.DeleteSegment"
 	query := "delete from segments where name = $1 returning id;"
+	getUsers := "select f.user_id from follows as f inner join segments as s on f.segment_id = s.id where s.name = $1;"
+	saveHistoryQuery := "insert into history (user_id, segment_name, operation) values ($1, $2, $3);"
+
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("%s begin tx error: %w", op, err)
+	}
+	defer tx.Rollback()
+	rows, err := tx.QueryContext(ctx, getUsers, name)
+	if err != nil {
+		return fmt.Errorf("%s exec error: %w", op, err)
+	}
+
+	defer rows.Close()
+	usersId := []int{}
+	for rows.Next() {
+		var id int
+		err = rows.Scan(&id)
+		if err != nil {
+			return fmt.Errorf("%s scan error: %w", op, err)
+		}
+		usersId = append(usersId, id)
+	}
+
+	for _, id := range usersId {
+		_, err := tx.ExecContext(ctx, saveHistoryQuery, id, name, UnFollowOperation)
+		if err != nil {
+			return fmt.Errorf("%s exec error: %w", op, err)
+		}
+	}
 
 	var id int
-	err := s.db.QueryRowContext(ctx, query, name).Scan(&id)
+	err = tx.QueryRowContext(ctx, query, name).Scan(&id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return ErrSegmentNotFound
 		}
 		return fmt.Errorf("%s exec error: %w", op, err)
 	}
-
+	tx.Commit()
 	return nil
 }
