@@ -14,7 +14,7 @@ import (
 func TestSaveUser(t *testing.T) {
 	userStorage := mocks.NewUser(t)
 	idToSave := 1
-	userStorage.On("SaveUser", mock.Anything, idToSave).Return(nil)
+	userStorage.On("SaveUser", mock.Anything, idToSave).Return(nil).Once()
 
 	userService := NewUserService(userStorage)
 	err := userService.SaveUser(context.Background(), idToSave)
@@ -24,7 +24,7 @@ func TestSaveUser(t *testing.T) {
 func TestSaveUserWithError(t *testing.T) {
 	userStorage := mocks.NewUser(t)
 	idToSave := 1
-	userStorage.On("SaveUser", mock.Anything, idToSave).Return(errors.New("error"))
+	userStorage.On("SaveUser", mock.Anything, idToSave).Return(errors.New("error")).Once()
 
 	userService := NewUserService(userStorage)
 	err := userService.SaveUser(context.Background(), idToSave)
@@ -36,7 +36,7 @@ func TestGetUsers(t *testing.T) {
 	returning := []entity.User{{Id: 1}, {Id: 2}, {Id: 3}}
 	excepted := []entity.User{{Id: 1}, {Id: 2}, {Id: 3}}
 
-	userStorage.On("GetUsers", mock.Anything).Return(returning, nil)
+	userStorage.On("GetUsers", mock.Anything).Return(returning, nil).Once()
 
 	userService := NewUserService(userStorage)
 	actual, err := userService.GetUsers(context.Background())
@@ -47,7 +47,7 @@ func TestGetUsers(t *testing.T) {
 func TestGetUsersWithError(t *testing.T) {
 	userStorage := mocks.NewUser(t)
 
-	userStorage.On("GetUsers", mock.Anything).Return(nil, errors.New("error"))
+	userStorage.On("GetUsers", mock.Anything).Return(nil, errors.New("error")).Once()
 
 	userService := NewUserService(userStorage)
 	actual, err := userService.GetUsers(context.Background())
@@ -59,7 +59,7 @@ func TestDeleteUser(t *testing.T) {
 	userStorage := mocks.NewUser(t)
 	idToDelete := 1
 
-	userStorage.On("DeleteUser", mock.Anything, idToDelete).Return(nil)
+	userStorage.On("DeleteUser", mock.Anything, idToDelete).Return(nil).Once()
 
 	userService := NewUserService(userStorage)
 	err := userService.DeleteUser(context.Background(), idToDelete)
@@ -70,7 +70,7 @@ func TestDeleteUserWithError(t *testing.T) {
 	userStorage := mocks.NewUser(t)
 	idToDelete := 1
 
-	userStorage.On("DeleteUser", mock.Anything, idToDelete).Return(errors.New("error"))
+	userStorage.On("DeleteUser", mock.Anything, idToDelete).Return(errors.New("error")).Once()
 
 	userService := NewUserService(userStorage)
 	err := userService.DeleteUser(context.Background(), idToDelete)
@@ -82,7 +82,7 @@ func TestFollowSegments(t *testing.T) {
 	userId := 1
 	segments := []string{"segment_1", "segment_2"}
 
-	userStorage.On("FollowToSegments", mock.Anything, userId, segments).Return(nil)
+	userStorage.On("FollowToSegments", mock.Anything, userId, segments).Return(nil).Once()
 
 	userService := NewUserService(userStorage)
 	err := userService.FollowToSegments(context.Background(), userId, segments)
@@ -94,7 +94,7 @@ func TestFollowSegmentsWithError(t *testing.T) {
 	userId := 1
 	segments := []string{"segment_1", "segment_2"}
 
-	userStorage.On("FollowToSegments", mock.Anything, userId, segments).Return(errors.New("error"))
+	userStorage.On("FollowToSegments", mock.Anything, userId, segments).Return(errors.New("error")).Once()
 
 	userService := NewUserService(userStorage)
 	err := userService.FollowToSegments(context.Background(), userId, segments)
@@ -106,7 +106,7 @@ func TestUnFollowSegments(t *testing.T) {
 	userId := 1
 	segments := []string{"segment_1", "segment_2"}
 
-	userStorage.On("UnFollowToSegments", mock.Anything, userId, segments).Return(nil)
+	userStorage.On("UnFollowToSegments", mock.Anything, userId, segments).Return(nil).Once()
 
 	userService := NewUserService(userStorage)
 	err := userService.UnFollowToSegments(context.Background(), userId, segments)
@@ -118,7 +118,7 @@ func TestUnFollowSegmentsWithError(t *testing.T) {
 	userId := 1
 	segments := []string{"segment_1", "segment_2"}
 
-	userStorage.On("UnFollowToSegments", mock.Anything, userId, segments).Return(errors.New("error"))
+	userStorage.On("UnFollowToSegments", mock.Anything, userId, segments).Return(errors.New("error")).Once()
 
 	userService := NewUserService(userStorage)
 	err := userService.UnFollowToSegments(context.Background(), userId, segments)
@@ -131,7 +131,7 @@ func TestGetUserSegments(t *testing.T) {
 
 	segments := []entity.Segment{{Id: 1, Name: "segment_1"}, {Id: 2, Name: "segment_2"}}
 
-	userStorage.On("GetUserSegments", mock.Anything, userId).Return([]entity.Segment{{Id: 1, Name: "segment_1"}, {Id: 2, Name: "segment_2"}}, nil)
+	userStorage.On("GetUserSegments", mock.Anything, userId).Return([]entity.Segment{{Id: 1, Name: "segment_1"}, {Id: 2, Name: "segment_2"}}, nil).Once()
 
 	userService := NewUserService(userStorage)
 	list, err := userService.GetUserSegments(context.Background(), userId)
@@ -145,7 +145,7 @@ func TestGetUserSegmentsWithError(t *testing.T) {
 	userStorage := mocks.NewUser(t)
 	userId := 1
 
-	userStorage.On("GetUserSegments", mock.Anything, userId).Return(nil, errors.New("error"))
+	userStorage.On("GetUserSegments", mock.Anything, userId).Return(nil, errors.New("error")).Once()
 
 	userService := NewUserService(userStorage)
 	list, err := userService.GetUserSegments(context.Background(), userId)

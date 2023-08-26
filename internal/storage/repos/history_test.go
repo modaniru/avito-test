@@ -2,7 +2,6 @@ package repos
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -41,7 +40,6 @@ func TestGetHistory(t *testing.T) {
 	err = userStorage.UnFollowToSegments(context.Background(), 1, []string{"AVITO_VOICE_MESSAGES"})
 	exceptedHistory = append([]entity.History{{UserId: 1, SegmentName: "AVITO_VOICE_MESSAGES", Operation: UnFollowOperation}}, exceptedHistory...)
 	history, err = historyStorage.GetHistory(context.Background())
-	fmt.Println(history)
 	require.Len(t, history, len(exceptedHistory))
 	for i := range history {
 		require.Equal(t, exceptedHistory[i].UserId, history[i].UserId)
