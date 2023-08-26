@@ -2,12 +2,15 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	log "log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/modaniru/avito/internal/service"
+	"github.com/modaniru/avito/internal/storage/repos"
 )
 
 type FollowRouter struct {
@@ -51,8 +54,17 @@ func (f *FollowRouter) FollowSegments(w http.ResponseWriter, r *http.Request) {
 	err = f.userService.FollowToSegments(r.Context(), input.UserId, input.Segments)
 
 	if err != nil {
+		if errors.Is(err, repos.ErrUserAlreadyHasThisSegment) {
+			log.Error("user alredy has some segments in this list", log.String("error", err.Error()))
+			writeError(w, http.StatusBadRequest, errors.New("user alredy has some segments in this list"))
+			return
+		} else if errors.Is(err, repos.ErrUserOrSegmentNotExists) {
+			log.Error("user or some segments in list not exist", log.String("error", err.Error()))
+			writeError(w, http.StatusBadRequest, errors.New("user or some segments in list not exist"))
+			return
+		}
 		log.Error("follow to segments error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -84,6 +96,11 @@ func (f *FollowRouter) UnfollowSegments(w http.ResponseWriter, r *http.Request) 
 
 	err = f.userService.UnFollowToSegments(r.Context(), input.UserId, input.Segments)
 	if err != nil {
+		if errors.Is(err, repos.ErrUserOrSegmentNotExists) {
+			log.Error("user or segment in list are not exist", log.String("error", err.Error()))
+			writeError(w, http.StatusBadRequest, errors.New("user or segment in list are not exist"))
+			return
+		}
 		log.Error("unfollow to segments error", log.String("error", err.Error()))
 		writeError(w, http.StatusBadRequest, err)
 		return
@@ -115,6 +132,11 @@ func (f *FollowRouter) GetUserSegments(w http.ResponseWriter, r *http.Request) {
 
 	segments, err := f.userService.GetUserSegments(r.Context(), input.Id)
 	if err != nil {
+		if errors.Is(err, repos.ErrUserNotFound) {
+			log.Error("user not found error", log.String("error", err.Error()))
+			writeError(w, http.StatusNotFound, fmt.Errorf("user with id=%d was not found", input.Id))
+			return
+		}
 		log.Error("get user segments error", log.String("error", err.Error()))
 		writeError(w, http.StatusBadRequest, err)
 		return

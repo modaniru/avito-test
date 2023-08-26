@@ -6,11 +6,13 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/lib/pq"
 	"github.com/modaniru/avito/internal/entity"
 )
 
 var (
-	ErrSegmentNotFound = errors.New("segment was not found")
+	ErrSegmentNotFound      = errors.New("segment was not found")
+	ErrSegmentAlreadyExists = errors.New("segment already exists")
 )
 
 type SegmentStorage struct {
@@ -28,6 +30,11 @@ func (s *SegmentStorage) SaveSegment(ctx context.Context, name string) (int, err
 	var id int
 	err := s.db.QueryRowContext(ctx, query, name).Scan(&id)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			if pqErr.Code == "23505" {
+				return 0, ErrSegmentAlreadyExists
+			}
+		}
 		return 0, fmt.Errorf("%s exec error: %w", op, err)
 	}
 

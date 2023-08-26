@@ -51,8 +51,13 @@ func (u *UserRouter) SaveUser(w http.ResponseWriter, r *http.Request) {
 
 	err = u.userService.SaveUser(r.Context(), input.Id)
 	if err != nil {
+		if errors.Is(err, repos.ErrUserAlreadyExists) {
+			log.Error("user already exists error", log.String("error", err.Error()))
+			writeError(w, http.StatusBadRequest, fmt.Errorf("user with id=%d already exists", input.Id))
+			return
+		}
 		log.Error("save user error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -84,7 +89,7 @@ func (u *UserRouter) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, repos.ErrUserNotFound) {
 			log.Error("user not found error", log.String("error", err.Error()))
-			writeError(w, http.StatusNotFound, errors.New(fmt.Sprintf("user with id=%d was not found", input.Id)))
+			writeError(w, http.StatusNotFound, fmt.Errorf("user with id=%d was not found", input.Id))
 			return
 		}
 		log.Error("delete user error", log.String("error", err.Error()))

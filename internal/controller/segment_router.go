@@ -51,6 +51,11 @@ func (s *SegmentRouter) SaveSegment(w http.ResponseWriter, r *http.Request) {
 
 	id, err := s.segmentService.SaveSegment(r.Context(), input.Name)
 	if err != nil {
+		if errors.Is(err, repos.ErrSegmentAlreadyExists) {
+			log.Error("segment already exists error", log.String("error", err.Error()))
+			writeError(w, http.StatusBadRequest, fmt.Errorf("segment with name=%s already exists", input.Name))
+			return
+		}
 		log.Error("save user error", log.String("error", err.Error()))
 		writeError(w, http.StatusBadRequest, err)
 		return
@@ -94,7 +99,7 @@ func (s *SegmentRouter) DeleteSegment(w http.ResponseWriter, r *http.Request) {
 	err = s.segmentService.DeleteSegment(r.Context(), input.Name)
 	if err != nil {
 		if errors.Is(err, repos.ErrSegmentNotFound) {
-			log.Error("user not found error", log.String("error", err.Error()))
+			log.Error("segment not found error", log.String("error", err.Error()))
 			writeError(w, http.StatusNotFound, errors.New(fmt.Sprintf("segment with name=%s was not found", input.Name)))
 			return
 		}
