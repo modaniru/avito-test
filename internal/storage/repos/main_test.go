@@ -59,7 +59,7 @@ func createTables() {
 	
 	create table follows(
 		user_id integer not null,
-		segment_id varchar not null,
+		segment_id integer not null,
 		expire timestamp default CURRENT_TIMESTAMP,
 		unique (user_id, segment_id),
 		foreign key (user_id) references users (id) on delete cascade,

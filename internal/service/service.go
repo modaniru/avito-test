@@ -23,16 +23,20 @@ type Segment interface {
 	DeleteSegment(ctx context.Context, name string) error
 }
 
-type History interface{
+type History interface {
 	GetHistory(ctx context.Context) ([]entity.History, error)
 }
 
 type Service struct {
 	User
+	Segment
+	History
 }
 
-func NewService(storage storage.Storage) *Service {
+func NewService(storage *storage.Storage) *Service {
 	return &Service{
-		User: services.NewUserService(storage.User),
+		User:    services.NewUserService(storage.User),
+		Segment: services.NewSegmentService(storage.Segment),
+		History: services.NewHistoryService(storage.History),
 	}
 }

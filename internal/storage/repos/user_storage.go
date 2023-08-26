@@ -3,6 +3,7 @@ package repos
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/modaniru/avito/internal/entity"
@@ -11,6 +12,10 @@ import (
 const (
 	FollowOperation   = "ADD SEGMENT"
 	UnFollowOperation = "REMOVE SEGMENT"
+)
+
+var (
+	ErrUserNotFound = errors.New("user not found")
 )
 
 type UserStorage struct {
@@ -56,12 +61,17 @@ func (u *UserStorage) GetUsers(ctx context.Context) ([]entity.User, error) {
 	return users, nil
 }
 
+// TODO test user not found
 func (u *UserStorage) DeleteUser(ctx context.Context, userId int) error {
 	op := "internal.storage.repos.UserStorage.DeleteUser"
-	query := "delete from users where id = $1;"
+	query := "delete from users where id = $1 returning id;"
 
-	_, err := u.db.ExecContext(ctx, query, userId)
+	var id int
+	err := u.db.QueryRowContext(ctx, query, userId).Scan(&id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrUserNotFound
+		}
 		return fmt.Errorf("%s exec error: %w", op, err)
 	}
 

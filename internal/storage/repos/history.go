@@ -16,7 +16,7 @@ func NewHistoryStorage(db *sql.DB) *HistoryStorage {
 	return &HistoryStorage{db: db}
 }
 
-func (h *HistoryStorage)  GetHistory(ctx context.Context) ([]entity.History, error){
+func (h *HistoryStorage) GetHistory(ctx context.Context) ([]entity.History, error) {
 	op := "internal.storage.repos.HistoryStorage.GetHistory"
 	query := "select user_id, segment_name, operation, operation_time from history order by operation_time desc;"
 

@@ -13,5 +13,5 @@ type History struct {
 }
 
 type User struct {
-	Id int
+	Id int `json:"id"`
 }
