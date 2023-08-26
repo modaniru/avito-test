@@ -8,6 +8,7 @@ import (
 	"github.com/modaniru/avito/internal/storage/repos"
 )
 
+//go:generate mockery --name User
 type User interface {
 	SaveUser(ctx context.Context, userId int) error
 	GetUsers(ctx context.Context) ([]entity.User, error)
@@ -17,12 +18,14 @@ type User interface {
 	GetUserSegments(ctx context.Context, id int) ([]entity.Segment, error)
 }
 
+//go:generate mockery --name Segment
 type Segment interface {
 	SaveSegment(ctx context.Context, name string) (int, error)
 	GetSegments(ctx context.Context) ([]entity.Segment, error)
 	DeleteSegment(ctx context.Context, name string) error
 }
 
+//go:generate mockery --name History
 type History interface {
 	GetHistory(ctx context.Context) ([]entity.History, error)
 }
