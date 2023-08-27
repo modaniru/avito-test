@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -16,6 +17,10 @@ type HistoryService struct {
 	historyStorage storage.History
 	yandexDisk     *yandexdrive.YandexDisk
 }
+
+var (
+	ErrServiceUnavailible = errors.New("history service unavailible")
+)
 
 func NewHistoryService(historyStorage storage.History, yandexDisk *yandexdrive.YandexDisk) *HistoryService {
 	return &HistoryService{historyStorage: historyStorage, yandexDisk: yandexDisk}
@@ -34,6 +39,9 @@ func (h *HistoryService) GetHistory(ctx context.Context) ([]entity.History, erro
 func (h *HistoryService) GetHistoryByDate(ctx context.Context, date string) (string, error) {
 	op := "internal.service.services.HistoryService.GetHistoryByDate"
 
+	if !h.yandexDisk.IsAvailible {
+		return "", ErrServiceUnavailible
+	}
 	history, err := h.historyStorage.GetHistoryByDate(ctx, date)
 	if err != nil {
 		return "", fmt.Errorf("%s get history by date error: %w", op, err)

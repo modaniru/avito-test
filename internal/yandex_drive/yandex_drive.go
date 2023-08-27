@@ -10,16 +10,20 @@ import (
 )
 
 type YandexDisk struct {
-	disk   yadisk.YaDisk
-	client *http.Client
+	disk        yadisk.YaDisk
+	client      *http.Client
+	IsAvailible bool
 }
 
 func NewYandexDisk(token string) (*YandexDisk, error) {
+	if token == "" {
+		return &YandexDisk{IsAvailible: false}, nil
+	}
 	yaDisk, err := yadisk.NewYaDisk(context.Background(), http.DefaultClient, &yadisk.Token{AccessToken: token})
 	if err != nil {
 		return nil, err
 	}
-	return &YandexDisk{disk: yaDisk, client: http.DefaultClient}, nil
+	return &YandexDisk{disk: yaDisk, client: http.DefaultClient, IsAvailible: true}, nil
 }
 
 func (y *YandexDisk) CreateFile(name string, data []byte) (string, error) {
