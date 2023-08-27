@@ -41,7 +41,6 @@ type Storage struct {
 
 func NewStorage(db *sql.DB) *Storage {
 	_, err := db.Exec(`
-	CREATE EXTENSION if not exists pg_cron;
 	create table if not exists users(
 		id integer primary key not null
 	);

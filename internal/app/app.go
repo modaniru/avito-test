@@ -11,6 +11,7 @@ import (
 	"github.com/modaniru/avito/internal/controller"
 	"github.com/modaniru/avito/internal/service"
 	"github.com/modaniru/avito/internal/storage"
+	yandexdrive "github.com/modaniru/avito/internal/yandex_drive"
 )
 
 func App() {
@@ -30,10 +31,15 @@ func App() {
 		return
 	}
 	log.Debug("database successfully load")
-
+	// TODO возможность не иметь ручки истории
 	log.Debug("start DI...")
 	storage := storage.NewStorage(db)
-	service := service.NewService(storage)
+	yandex, err := yandexdrive.NewYandexDisk(config.YandexToken)
+	if err != nil {
+		log.Error("create yandex disk error", log.String("error", err.Error()))
+		return
+	}
+	service := service.NewService(storage, yandex)
 	r := chi.NewRouter()
 	controller.NewRouter(r, service)
 	log.Debug("finish DI")

@@ -17,29 +17,9 @@ func NewHistoryRouter(historyService service.History) chi.Router {
 	h := HistoryRouter{historyService: historyService}
 	r := chi.NewRouter()
 
-	r.Get("/", h.GetHistory)
 	r.Get("/date", h.GetHistoryByDate)
 
 	return r
-}
-
-func (h *HistoryRouter) GetHistory(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-
-	history, err := h.historyService.GetHistory(r.Context())
-	if err != nil {
-		log.Error("get history error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
-		return
-	}
-	b, err := json.Marshal(history)
-	if err != nil {
-		log.Error("marshal []history error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(b)
 }
 
 func (h *HistoryRouter) GetHistoryByDate(w http.ResponseWriter, r *http.Request) {
@@ -53,9 +33,14 @@ func (h *HistoryRouter) GetHistoryByDate(w http.ResponseWriter, r *http.Request)
 		writeError(w, http.StatusInternalServerError, err)
 		return
 	}
-	b, err := json.Marshal(history)
+
+	type historyResponse struct {
+		Link string `json:"link"`
+	}
+
+	b, err := json.Marshal(&historyResponse{Link: history})
 	if err != nil {
-		log.Error("marshal []history error", log.String("error", err.Error()))
+		log.Error("marshal history error", log.String("error", err.Error()))
 		writeError(w, http.StatusInternalServerError, err)
 		return
 	}

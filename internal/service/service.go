@@ -6,6 +6,7 @@ import (
 	"github.com/modaniru/avito/internal/entity"
 	"github.com/modaniru/avito/internal/service/services"
 	"github.com/modaniru/avito/internal/storage"
+	yandexdrive "github.com/modaniru/avito/internal/yandex_drive"
 )
 
 type User interface {
@@ -26,7 +27,7 @@ type Segment interface {
 
 type History interface {
 	GetHistory(ctx context.Context) ([]entity.History, error)
-	GetHistoryByDate(ctx context.Context, date string) ([]entity.History, error)
+	GetHistoryByDate(ctx context.Context, date string) (string, error)
 }
 
 type Service struct {
@@ -35,10 +36,10 @@ type Service struct {
 	History
 }
 
-func NewService(storage *storage.Storage) *Service {
+func NewService(storage *storage.Storage, yandex *yandexdrive.YandexDisk) *Service {
 	return &Service{
 		User:    services.NewUserService(storage.User),
 		Segment: services.NewSegmentService(storage.Segment),
-		History: services.NewHistoryService(storage.History),
+		History: services.NewHistoryService(storage.History, yandex),
 	}
 }
