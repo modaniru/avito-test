@@ -17,6 +17,7 @@ type User interface {
 	FollowToSegments(ctx context.Context, userId int, segments []string) error
 	UnFollowToSegments(ctx context.Context, userId int, segments []string) error
 	GetUserSegments(ctx context.Context, id int) ([]entity.Segment, error)
+	FollowRandomUsers(ctx context.Context, name string, percent float64) error
 }
 
 //go:generate mockery --name Segment

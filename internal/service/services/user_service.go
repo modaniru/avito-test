@@ -75,3 +75,13 @@ func (u *UserService) GetUserSegments(ctx context.Context, userId int) ([]entity
 	}
 	return segments, nil
 }
+
+func (u *UserService) FollowRandomUsers(ctx context.Context, name string, percent float64) error {
+	op := "internal.service.services.UserService.FollowRandomUsers"
+
+	err := u.userStorage.FollowRandomUsers(ctx, name, percent)
+	if err != nil {
+		return fmt.Errorf("%s get user segments error: %w", op, err)
+	}
+	return nil
+}

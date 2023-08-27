@@ -208,3 +208,56 @@ func (u *UserStorage) GetUserSegments(ctx context.Context, id int) ([]entity.Seg
 	}
 	return segments, nil
 }
+//TODO return users affected
+//TODO можно ли как-то упростить запрос?
+func (u *UserStorage) FollowRandomUsers(ctx context.Context, name string, percent float64) error {
+	op := "internal.storage.repos.UserStorage.FollowRandomUsers"
+	query := "select id from users where not (id = any (select f.user_id from follows as f inner join segments as s on f.segment_id = s.id where s.name = $1)) group by id limit ceil(((select count(*) from users) - ((select count(f.user_id) from follows as f inner join segments as s on f.segment_id = s.id where s.name = $1)))::float * $2::float)::integer;"
+	saveFollowQuery := "insert into follows (user_id, segment_id) values ($1, (select id from segments where name = $2));"
+	saveHistoryQuery := "insert into history (user_id, segment_name, operation) values ($1, $2, $3);"
+
+	tx, err := u.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("%s begin tx error: %w", op, err)
+	}
+
+	defer tx.Rollback()
+
+	rows, err := tx.QueryContext(ctx, query, name, percent)
+	if err != nil {
+		return fmt.Errorf("%s exec error: %w", op, err)
+	}
+	defer rows.Close()
+	ids := []int{}
+	for rows.Next() {
+		var id int
+		err = rows.Scan(&id)
+		if err != nil {
+			return fmt.Errorf("%s scan error: %w", op, err)
+		}
+		ids = append(ids, id)
+	}
+
+	for _, id := range ids {
+		_, err = tx.ExecContext(ctx, saveFollowQuery, id, name)
+		if err != nil {
+			if pqErr, ok := err.(*pq.Error); ok {
+				// Already exists
+				if pqErr.Code == "23505" {
+					return ErrUserAlreadyHasThisSegment
+				} else if pqErr.Code == "23503" || pqErr.Code == "23502" { //foreign key not present or segment_id equals null
+					return ErrUserOrSegmentNotExists
+				}
+			}
+			return fmt.Errorf("%s exec error: %w", op, err)
+		}
+		_, err := tx.ExecContext(ctx, saveHistoryQuery, id, name, FollowOperation)
+		if err != nil {
+			return fmt.Errorf("%s exec error: %w", op, err)
+		}
+	}
+
+	tx.Commit()
+
+	return nil
+}
