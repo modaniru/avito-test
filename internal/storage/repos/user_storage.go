@@ -208,8 +208,9 @@ func (u *UserStorage) GetUserSegments(ctx context.Context, id int) ([]entity.Seg
 	}
 	return segments, nil
 }
-//TODO return users affected
-//TODO можно ли как-то упростить запрос?
+
+// TODO return users affected
+// TODO можно ли как-то упростить запрос?
 func (u *UserStorage) FollowRandomUsers(ctx context.Context, name string, percent float64) error {
 	op := "internal.storage.repos.UserStorage.FollowRandomUsers"
 	query := "select id from users where not (id = any (select f.user_id from follows as f inner join segments as s on f.segment_id = s.id where s.name = $1)) group by id limit ceil(((select count(*) from users) - ((select count(f.user_id) from follows as f inner join segments as s on f.segment_id = s.id where s.name = $1)))::float * $2::float)::integer;"

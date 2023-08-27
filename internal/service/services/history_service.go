@@ -25,3 +25,13 @@ func (h *HistoryService) GetHistory(ctx context.Context) ([]entity.History, erro
 	}
 	return history, nil
 }
+
+func (h *HistoryService) GetHistoryByDate(ctx context.Context, date string) ([]entity.History, error) {
+	op := "internal.service.services.HistoryService.GetHistoryByDate"
+
+	history, err := h.historyStorage.GetHistoryByDate(ctx, date)
+	if err != nil {
+		return nil, fmt.Errorf("%s get history by date error: %w", op, err)
+	}
+	return history, nil
+}

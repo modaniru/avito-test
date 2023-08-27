@@ -37,3 +37,25 @@ func (h *HistoryStorage) GetHistory(ctx context.Context) ([]entity.History, erro
 	}
 	return history, nil
 }
+
+func (h *HistoryStorage) GetHistoryByDate(ctx context.Context, date string) ([]entity.History, error) {
+	op := "internal.storage.repos.HistoryStorage.GetHistory"
+	query := "select user_id, segment_name, operation, operation_time from history where operation_time::varchar like $1 order by operation_time desc;"
+
+	rows, err := h.db.QueryContext(ctx, query, date+"%")
+	if err != nil {
+		return nil, fmt.Errorf("%s exec error: %w", op, err)
+	}
+
+	defer rows.Close()
+	history := make([]entity.History, 0)
+	for rows.Next() {
+		var h entity.History
+		err := rows.Scan(&h.UserId, &h.SegmentName, &h.Operation, &h.OperationTime)
+		if err != nil {
+			return nil, fmt.Errorf("%s scan error: %w", op, err)
+		}
+		history = append(history, h)
+	}
+	return history, nil
+}
