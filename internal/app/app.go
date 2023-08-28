@@ -20,7 +20,7 @@ func App() {
 	log.Debug("logger was successfully configured")
 
 	log.Debug("open database connection...")
-	db, err := sql.Open("postgres", config.DatabaseSource)
+	db, err := sql.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", config.DatabaseUser, config.DatabasePassword, config.DatabaseHost, config.DatabaseName))
 	if err != nil {
 		log.Error("open database error", log.String("error", err.Error()))
 		return

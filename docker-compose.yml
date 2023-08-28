@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+  avito:
+    build: .
+    environment:
+      DB_NAME: "${DB_NAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_USER: "${DB_USER}"
+      DB_HOST: "db"
+      LOG_LEVEL: "${LOG_LEVEL}"
+      YANDEX_TOKEN: "${YANDEX_TOKEN}"
+    ports:
+        - "80:${PORT}"
+    restart: always
+  db:
+    image: "postgres:latest"
+    environment:
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_DB: "${DB_NAME}"
+    restart: always

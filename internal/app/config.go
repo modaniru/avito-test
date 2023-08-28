@@ -9,10 +9,13 @@ import (
 )
 
 type Config struct {
-	Port           string `env:"PORT" env-default:"80"`
-	DatabaseSource string `env:"DB_SOURCE"`
-	LogLevel       string `env:"LOG_LEVEL" env-default:"debug"`
-	YandexToken    string `env:"YANDEX_TOKEN"`
+	Port             string `env:"PORT" env-default:"80"`
+	DatabaseHost     string `env:"DB_HOST" env-default:"localhost:5432"`
+	DatabasePassword string `env:"DB_PASSWORD" env-default:"postgres"`
+	DatabaseName     string `env:"DB_NAME" env-default:"postgres"`
+	DatabaseUser     string `env:"DB_USER" env-default:"postgres"`
+	LogLevel         string `env:"LOG_LEVEL" env-default:"debug"`
+	YandexToken      string `env:"YANDEX_TOKEN"`
 }
 
 func configure() *Config {
