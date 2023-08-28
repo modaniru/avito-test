@@ -66,7 +66,7 @@ func (u *UserService) UnFollowToSegments(ctx context.Context, userId int, segmen
 	return nil
 }
 
-func (u *UserService) GetUserSegments(ctx context.Context, userId int) ([]entity.Segment, error) {
+func (u *UserService) GetUserSegments(ctx context.Context, userId int) ([]entity.Follows, error) {
 	op := "internal.service.services.UserService.GetUserSegments"
 
 	segments, err := u.userStorage.GetUserSegments(ctx, userId)

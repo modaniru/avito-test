@@ -183,7 +183,7 @@ func (u *UserStorage) UnFollowToSegments(ctx context.Context, userId int, segmen
 	return nil
 }
 
-func (u *UserStorage) GetUserSegments(ctx context.Context, id int) ([]entity.Segment, error) {
+func (u *UserStorage) GetUserSegments(ctx context.Context, id int) ([]entity.Follows, error) {
 	op := "internal.storage.repos.UserStorage.GetUserSegments"
 	query := "select s.id, s.name, f.expire from follows as f inner join segments as s on f.segment_id = s.id where f.user_id = $1;"
 	findUserQuery := "select id from users where id = $1;"
@@ -203,9 +203,9 @@ func (u *UserStorage) GetUserSegments(ctx context.Context, id int) ([]entity.Seg
 	}
 
 	defer rows.Close()
-	segments := make([]entity.Segment, 0)
+	segments := make([]entity.Follows, 0)
 	for rows.Next() {
-		var segment entity.Segment
+		var segment entity.Follows
 		err := rows.Scan(&segment.Id, &segment.Name, &segment.Expire)
 		if err != nil {
 			return nil, fmt.Errorf("%s scan error: %w", op, err)

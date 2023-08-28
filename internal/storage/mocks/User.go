@@ -67,19 +67,19 @@ func (_m *User) FollowToSegments(ctx context.Context, userId int, segments []str
 }
 
 // GetUserSegments provides a mock function with given fields: ctx, id
-func (_m *User) GetUserSegments(ctx context.Context, id int) ([]entity.Segment, error) {
+func (_m *User) GetUserSegments(ctx context.Context, id int) ([]entity.Follows, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 []entity.Segment
+	var r0 []entity.Follows
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int) ([]entity.Segment, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int) ([]entity.Follows, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int) []entity.Segment); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int) []entity.Follows); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]entity.Segment)
+			r0 = ret.Get(0).([]entity.Follows)
 		}
 	}
 

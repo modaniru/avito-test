@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	log "log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -36,28 +35,24 @@ type FollowSegmentsInput struct {
 	Expire   *string  `json:"expire,omitempty"`
 }
 
-// TODO user not found or segment handle error
 func (f *FollowRouter) FollowSegments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Error("read body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "read body error", err)
 		return
 	}
 
 	var input FollowSegmentsInput
 	err = json.Unmarshal(b, &input)
 	if err != nil {
-		log.Error("unmarshal body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "unmarshal body error", err)
 		return
 	}
 
 	err = validation.ValidateDate(*input.Expire)
 	if err != nil {
-		log.Error("validate date error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, errors.New("validate date error"))
+		writeError(w, http.StatusBadRequest, "validate date error", err)
 		return
 	}
 
@@ -65,16 +60,13 @@ func (f *FollowRouter) FollowSegments(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if errors.Is(err, repos.ErrUserAlreadyHasThisSegment) {
-			log.Error("user alredy has some segments in this list", log.String("error", err.Error()))
-			writeError(w, http.StatusBadRequest, errors.New("user alredy has some segments in this list"))
+			writeError(w, http.StatusBadRequest, "user alredy has some segments in this list", err)
 			return
-		} else if errors.Is(err, repos.ErrUserOrSegmentNotExists) {
-			log.Error("user or some segments in list not exist", log.String("error", err.Error()))
-			writeError(w, http.StatusBadRequest, errors.New("user or some segments in list not exist"))
+		} else if errors.Is(err, repos.ErrSegmentNotFound) {
+			writeError(w, http.StatusBadRequest, "some segments in list not exist", err)
 			return
 		}
-		log.Error("follow to segments error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "follow to segments error", err)
 		return
 	}
 
@@ -91,28 +83,24 @@ func (f *FollowRouter) UnfollowSegments(w http.ResponseWriter, r *http.Request) 
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Error("read body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "read body error", err)
 		return
 	}
 
 	var input UnfollowSegmentsInput
 	err = json.Unmarshal(b, &input)
 	if err != nil {
-		log.Error("unmarshal body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "unmarshal body error", err)
 		return
 	}
 
 	err = f.userService.UnFollowToSegments(r.Context(), input.UserId, input.Segments)
 	if err != nil {
 		if errors.Is(err, repos.ErrUserOrSegmentNotExists) {
-			log.Error("user or segment in list are not exist", log.String("error", err.Error()))
-			writeError(w, http.StatusBadRequest, errors.New("user or segment in list are not exist"))
+			writeError(w, http.StatusBadRequest, "user or segment in list are not exist", err)
 			return
 		}
-		log.Error("unfollow to segments error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusInternalServerError, "unfollow to segments error", err)
 		return
 	}
 
@@ -127,34 +115,29 @@ func (f *FollowRouter) GetUserSegments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Error("read body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "read body error", err)
 		return
 	}
 
 	var input GetUserSegmentsInput
 	err = json.Unmarshal(b, &input)
 	if err != nil {
-		log.Error("unmarshal body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "unmarshal body error", err)
 		return
 	}
 
 	segments, err := f.userService.GetUserSegments(r.Context(), input.Id)
 	if err != nil {
 		if errors.Is(err, repos.ErrUserNotFound) {
-			log.Error("user not found error", log.String("error", err.Error()))
-			writeError(w, http.StatusNotFound, fmt.Errorf("user with id=%d was not found", input.Id))
+			writeError(w, http.StatusNotFound, fmt.Sprintf("user with id=%d was not found", input.Id), err)
 			return
 		}
-		log.Error("get user segments error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "get user segments error", err)
 		return
 	}
 	b, err = json.Marshal(segments)
 	if err != nil {
-		log.Error("marshal []segments error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "marshal []segments error", err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -170,22 +153,19 @@ func (f *FollowRouter) RandomFollow(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Error("read body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "read body error", err)
 		return
 	}
 
 	var input RandomFollowInput
 	err = json.Unmarshal(b, &input)
 	if err != nil {
-		log.Error("unmarshal body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "unmarshal body error", err)
 		return
 	}
 	err = validation.ValidatePercent(input.Percent)
 	if err != nil {
-		log.Error("validate percent error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, errors.New("validate percent error"))
+		writeError(w, http.StatusBadRequest, "validate percent error", err)
 		return
 	}
 
@@ -193,16 +173,13 @@ func (f *FollowRouter) RandomFollow(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if errors.Is(err, repos.ErrUserAlreadyHasThisSegment) {
-			log.Error("user alredy has some segments in this list", log.String("error", err.Error()))
-			writeError(w, http.StatusBadRequest, errors.New("user alredy has some segments in this list"))
+			writeError(w, http.StatusBadRequest, "user alredy has some segments in this list", err)
 			return
 		} else if errors.Is(err, repos.ErrUserOrSegmentNotExists) {
-			log.Error("user or some segments in list not exist", log.String("error", err.Error()))
-			writeError(w, http.StatusBadRequest, errors.New("user or some segments in list not exist"))
+			writeError(w, http.StatusBadRequest, "user or some segments in list not exist", err)
 			return
 		}
-		log.Error("follow to segments error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "follow to segments error", err)
 		return
 	}
 
@@ -212,8 +189,7 @@ func (f *FollowRouter) RandomFollow(w http.ResponseWriter, r *http.Request) {
 
 	b, err = json.Marshal(&RandomFollowResponse{RowsAffected: rowsAffected})
 	if err != nil {
-		log.Error("marshal RandomFollowResponse error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "marshal RandomFollowResponse error", err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

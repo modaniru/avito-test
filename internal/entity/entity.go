@@ -1,6 +1,11 @@
 package entity
 
 type Segment struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type Follows struct {
 	Id     int     `json:"id"`
 	Name   string  `json:"name"`
 	Expire *string `json:"expire"`

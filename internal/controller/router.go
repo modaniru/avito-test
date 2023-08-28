@@ -21,8 +21,9 @@ type ErrorResponse struct {
 	ErrorMessage string `json:"error_message"`
 }
 
-func writeError(w http.ResponseWriter, status int, err error) {
-	b, err := json.Marshal(ErrorResponse{Status: status, ErrorMessage: err.Error()})
+func writeError(w http.ResponseWriter, status int, message string, err error) {
+	log.Error(message, log.String("error", err.Error()))
+	b, err := json.Marshal(ErrorResponse{Status: status, ErrorMessage: message})
 	if err != nil {
 		log.Error("marshar 'ErrorResponse' error", log.String("error", err.Error()))
 		return

@@ -16,7 +16,7 @@ type User interface {
 	DeleteUser(ctx context.Context, userId int) error
 	FollowToSegments(ctx context.Context, userId int, segments []string, date *string) error
 	UnFollowToSegments(ctx context.Context, userId int, segments []string) error
-	GetUserSegments(ctx context.Context, id int) ([]entity.Segment, error)
+	GetUserSegments(ctx context.Context, id int) ([]entity.Follows, error)
 	FollowRandomUsers(ctx context.Context, name string, percent float64) (int, error)
 }
 

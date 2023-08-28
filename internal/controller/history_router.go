@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"errors"
-	log "log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -30,20 +29,17 @@ func (h *HistoryRouter) GetHistoryByDate(w http.ResponseWriter, r *http.Request)
 	date := r.URL.Query().Get("date")
 	err := validation.ValidateDate(date)
 	if err != nil {
-		log.Error("validate date error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, errors.New("validate date error"))
+		writeError(w, http.StatusBadRequest, "validate date error", err)
 		return
 	}
 
 	history, err := h.historyService.GetHistoryByDate(r.Context(), date)
 	if err != nil {
 		if errors.Is(err, services.ErrServiceUnavailible) {
-			log.Error("history service is unavailible", log.String("error", err.Error()))
-			writeError(w, http.StatusBadRequest, errors.New("history service is unavailible"))
+			writeError(w, http.StatusBadRequest, "history service is unavailible", err)
 			return
 		}
-		log.Error("get history error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "get history error", err)
 		return
 	}
 
@@ -53,8 +49,7 @@ func (h *HistoryRouter) GetHistoryByDate(w http.ResponseWriter, r *http.Request)
 
 	b, err := json.Marshal(&historyResponse{Link: history})
 	if err != nil {
-		log.Error("marshal history error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "marshal history error", err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

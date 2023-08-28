@@ -3,9 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
-	log "log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -37,34 +35,29 @@ func (s *SegmentRouter) SaveSegment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Error("read body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "read body error", err)
 		return
 	}
 
 	var input SaveSegmentInput
 	err = json.Unmarshal(b, &input)
 	if err != nil {
-		log.Error("unmarshal body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "unmarshal body error", err)
 		return
 	}
 	err = validation.ValidateSegment(input.Name)
 	if err != nil {
-		log.Error("validate segment name error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, errors.New("validate segment name error"))
+		writeError(w, http.StatusBadRequest, "validate segment name error", err)
 		return
 	}
 
 	id, err := s.segmentService.SaveSegment(r.Context(), input.Name)
 	if err != nil {
 		if errors.Is(err, repos.ErrSegmentAlreadyExists) {
-			log.Error("segment already exists error", log.String("error", err.Error()))
-			writeError(w, http.StatusBadRequest, fmt.Errorf("segment with name=%s already exists", input.Name))
+			writeError(w, http.StatusBadRequest, "segment already exists error", err)
 			return
 		}
-		log.Error("save user error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "save user error", err)
 		return
 	}
 
@@ -73,8 +66,7 @@ func (s *SegmentRouter) SaveSegment(w http.ResponseWriter, r *http.Request) {
 	}
 	b, err = json.Marshal(response{Id: id})
 	if err != nil {
-		log.Error("marshal users error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "marshal users error", err)
 		return
 	}
 
@@ -90,28 +82,24 @@ func (s *SegmentRouter) DeleteSegment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Error("read body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "read body error", err)
 		return
 	}
 
 	var input DeleteSegmentInput
 	err = json.Unmarshal(b, &input)
 	if err != nil {
-		log.Error("unmarshal body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "unmarshal body error", err)
 		return
 	}
 
 	err = s.segmentService.DeleteSegment(r.Context(), input.Name)
 	if err != nil {
 		if errors.Is(err, repos.ErrSegmentNotFound) {
-			log.Error("segment not found error", log.String("error", err.Error()))
-			writeError(w, http.StatusNotFound, errors.New(fmt.Sprintf("segment with name=%s was not found", input.Name)))
+			writeError(w, http.StatusNotFound, "segment not found error", err)
 			return
 		}
-		log.Error("delete segment error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "delete segment error", err)
 		return
 	}
 
@@ -122,14 +110,12 @@ func (s *SegmentRouter) GetSegments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	segments, err := s.segmentService.GetSegments(r.Context())
 	if err != nil {
-		log.Error("get segments error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "get segments error", err)
 		return
 	}
 	b, err := json.Marshal(segments)
 	if err != nil {
-		log.Error("marshal segments error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "marshal segments error", err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

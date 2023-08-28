@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	log "log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -36,28 +35,24 @@ func (u *UserRouter) SaveUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Error("read body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "read body error", err)
 		return
 	}
 
 	var input SaveUserInput
 	err = json.Unmarshal(b, &input)
 	if err != nil {
-		log.Error("unmarshal body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "unmarshal body error", err)
 		return
 	}
 
 	err = u.userService.SaveUser(r.Context(), input.Id)
 	if err != nil {
 		if errors.Is(err, repos.ErrUserAlreadyExists) {
-			log.Error("user already exists error", log.String("error", err.Error()))
-			writeError(w, http.StatusBadRequest, fmt.Errorf("user with id=%d already exists", input.Id))
+			writeError(w, http.StatusBadRequest, fmt.Sprintf("user with id=%d already exists", input.Id), err)
 			return
 		}
-		log.Error("save user error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "save user error", err)
 		return
 	}
 
@@ -72,28 +67,24 @@ func (u *UserRouter) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Error("read body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "read body error", err)
 		return
 	}
 
 	var input DeleteUserInput
 	err = json.Unmarshal(b, &input)
 	if err != nil {
-		log.Error("unmarshal body error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "unmarshal body error", err)
 		return
 	}
 
 	err = u.userService.DeleteUser(r.Context(), input.Id)
 	if err != nil {
 		if errors.Is(err, repos.ErrUserNotFound) {
-			log.Error("user not found error", log.String("error", err.Error()))
-			writeError(w, http.StatusNotFound, fmt.Errorf("user with id=%d was not found", input.Id))
+			writeError(w, http.StatusNotFound, fmt.Sprintf("user with id=%d was not found", input.Id), err)
 			return
 		}
-		log.Error("delete user error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusInternalServerError, "delete user error", err)
 		return
 	}
 
@@ -104,14 +95,12 @@ func (u *UserRouter) GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	users, err := u.userService.GetUsers(r.Context())
 	if err != nil {
-		log.Error("get users error", log.String("error", err.Error()))
-		writeError(w, http.StatusBadRequest, err)
+		writeError(w, http.StatusBadRequest, "get users error", err)
 		return
 	}
 	b, err := json.Marshal(users)
 	if err != nil {
-		log.Error("marshal users error", log.String("error", err.Error()))
-		writeError(w, http.StatusInternalServerError, err)
+		writeError(w, http.StatusInternalServerError, "marshal users error", err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
