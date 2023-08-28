@@ -173,7 +173,7 @@ func (f *FollowRouter) RandomFollow(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, err)
 		return
 	}
-	err = f.userService.FollowRandomUsers(r.Context(), input.Name, input.Percent)
+	rowsAffected, err := f.userService.FollowRandomUsers(r.Context(), input.Name, input.Percent)
 
 	if err != nil {
 		if errors.Is(err, repos.ErrUserAlreadyHasThisSegment) {
@@ -190,5 +190,16 @@ func (f *FollowRouter) RandomFollow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	type RandomFollowResponse struct {
+		RowsAffected int `json:"rows_affected"`
+	}
+
+	b, err = json.Marshal(&RandomFollowResponse{RowsAffected: rowsAffected})
+	if err != nil {
+		log.Error("marshal RandomFollowResponse error", log.String("error", err.Error()))
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
 }

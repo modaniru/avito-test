@@ -29,17 +29,27 @@ func (_m *User) DeleteUser(ctx context.Context, userId int) error {
 }
 
 // FollowRandomUsers provides a mock function with given fields: ctx, name, percent
-func (_m *User) FollowRandomUsers(ctx context.Context, name string, percent float64) error {
+func (_m *User) FollowRandomUsers(ctx context.Context, name string, percent float64) (int, error) {
 	ret := _m.Called(ctx, name, percent)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, float64) error); ok {
+	var r0 int
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, float64) (int, error)); ok {
+		return rf(ctx, name, percent)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, float64) int); ok {
 		r0 = rf(ctx, name, percent)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(int)
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(context.Context, string, float64) error); ok {
+		r1 = rf(ctx, name, percent)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // FollowToSegments provides a mock function with given fields: ctx, userId, segments
