@@ -1,0 +1,312 @@
+{
+	"info": {
+		"_postman_id": "8f1406fd-fcb3-4bdc-a322-d1d2ed607599",
+		"name": "avito",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11715046"
+	},
+	"item": [
+		{
+			"name": "save user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:80/user",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"user"
+					]
+				},
+				"description": "Сохраняет id пользователя."
+			},
+			"response": []
+		},
+		{
+			"name": "delete user",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:80/user/",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"user",
+						""
+					]
+				},
+				"description": "Удаляет пользователя по id."
+			},
+			"response": []
+		},
+		{
+			"name": "get users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:80/user/all",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"user",
+						"all"
+					]
+				},
+				"description": "Получить всех пользователей."
+			},
+			"response": []
+		},
+		{
+			"name": "get segments",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:80/segment/all",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"segment",
+						"all"
+					]
+				},
+				"description": "Получить все сегменты."
+			},
+			"response": []
+		},
+		{
+			"name": "save segment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"AVITO_VOICE_MESSAGES\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:80/segment",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"segment"
+					]
+				},
+				"description": "Сохранить сегмент."
+			},
+			"response": []
+		},
+		{
+			"name": "delete segment",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"AVITO_DISCOUNT_30\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:80/segment",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"segment"
+					]
+				},
+				"description": "Удалить сегмент по имени."
+			},
+			"response": []
+		},
+		{
+			"name": "get user segments",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:80/user/segment/",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"user",
+						"segment",
+						""
+					]
+				},
+				"description": "Получить сегменты пользователя."
+			},
+			"response": []
+		},
+		{
+			"name": "add segment to user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_id\": 1,\n    \"segments\": [\"AVITO_VOICE_MESSAGES\",\"AVITO_DISCOUNT_50\",\"AVITO_PERFORMANCE_VAS\",\"AVITO_DISCOUNT_30\"],\n    \"expire\": \"2023-08-28\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:80/user/segment/",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"user",
+						"segment",
+						""
+					]
+				},
+				"description": "Добавить пользователю список сегментов.\n\nПоле expire опционально и позволяет временно устанавливать сегменты пользователю."
+			},
+			"response": []
+		},
+		{
+			"name": "delete user segment",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_id\": 1,\n    \"segments\": [\"AVITO_DISCOUNT_30\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:80/user/segment/",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"user",
+						"segment",
+						""
+					]
+				},
+				"description": "Удалить список сегментов у пользователя."
+			},
+			"response": []
+		},
+		{
+			"name": "set auto follows",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"AVITO_IMAGES_213\",\n    \"percent\": 0.5\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:80/user/segment/auto",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"user",
+						"segment",
+						"auto"
+					]
+				},
+				"description": "Добавить сегмент указоному проценту пользователей."
+			},
+			"response": []
+		},
+		{
+			"name": "get csv history file",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:80/history/date?date=2023-08-31",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"history",
+						"date"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2023-08-31"
+						}
+					]
+				},
+				"description": "Получить историю по ГГГГ-ММ или ГГГГ-ММ-ДД"
+			},
+			"response": []
+		}
+	]
+}
