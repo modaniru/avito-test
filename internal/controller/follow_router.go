@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/modaniru/avito/internal/service"
 	"github.com/modaniru/avito/internal/storage/repos"
+	"github.com/modaniru/avito/internal/validation"
 )
 
 type FollowRouter struct {
@@ -173,6 +174,13 @@ func (f *FollowRouter) RandomFollow(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, err)
 		return
 	}
+	err = validation.ValidatePercent(input.Percent)
+	if err != nil {
+		log.Error("validate percent error", log.String("error", err.Error()))
+		writeError(w, http.StatusBadRequest, errors.New("validate percent error"))
+		return
+	}
+
 	rowsAffected, err := f.userService.FollowRandomUsers(r.Context(), input.Name, input.Percent)
 
 	if err != nil {

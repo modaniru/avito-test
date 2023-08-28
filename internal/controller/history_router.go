@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/modaniru/avito/internal/service"
 	"github.com/modaniru/avito/internal/service/services"
+	"github.com/modaniru/avito/internal/validation"
 )
 
 type HistoryRouter struct {
@@ -27,7 +28,12 @@ func NewHistoryRouter(historyService service.History) chi.Router {
 func (h *HistoryRouter) GetHistoryByDate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	date := r.URL.Query().Get("date")
-	//validate date
+	err := validation.ValidateDate(date)
+	if err != nil {
+		log.Error("validate date error", log.String("error", err.Error()))
+		writeError(w, http.StatusBadRequest, errors.New("validate date error"))
+		return
+	}
 
 	history, err := h.historyService.GetHistoryByDate(r.Context(), date)
 	if err != nil {

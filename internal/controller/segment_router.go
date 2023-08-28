@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/modaniru/avito/internal/service"
 	"github.com/modaniru/avito/internal/storage/repos"
+	"github.com/modaniru/avito/internal/validation"
 )
 
 type SegmentRouter struct {
@@ -46,6 +47,12 @@ func (s *SegmentRouter) SaveSegment(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("unmarshal body error", log.String("error", err.Error()))
 		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	err = validation.ValidateSegment(input.Name)
+	if err != nil {
+		log.Error("validate segment name error", log.String("error", err.Error()))
+		writeError(w, http.StatusBadRequest, errors.New("validate segment name error"))
 		return
 	}
 
