@@ -9,8 +9,8 @@ import (
 )
 
 type Config struct {
-	Port           string `env:"PORT" env-default:"8080"`
-	DatabaseSource string `env:"DB_SOURCE" env-default:"postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"`
+	Port           string `env:"PORT" env-default:"80"`
+	DatabaseSource string `env:"DB_SOURCE"`
 	LogLevel       string `env:"LOG_LEVEL" env-default:"debug"`
 	YandexToken    string `env:"YANDEX_TOKEN"`
 }
