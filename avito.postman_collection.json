@@ -307,6 +307,26 @@
 				"description": "Получить историю по ГГГГ-ММ или ГГГГ-ММ-ДД"
 			},
 			"response": []
+		},
+		{
+			"name": "swagger",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:80/swagger/",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"swagger",
+						""
+					]
+				},
+				"description": "swagger"
+			},
+			"response": []
 		}
 	]
 }
