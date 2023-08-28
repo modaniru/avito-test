@@ -9,21 +9,27 @@ import (
 	yadisk "github.com/nikitaksv/yandex-disk-sdk-go"
 )
 
+//go:generate mockery --name Disk
+type Disk interface {
+	CreateFile(name string, data []byte) (string, error)
+	IsAvailible() bool
+}
+
 type YandexDisk struct {
 	disk        yadisk.YaDisk
 	client      *http.Client
-	IsAvailible bool
+	isAvailible bool
 }
 
 func NewYandexDisk(token string) (*YandexDisk, error) {
 	if token == "" {
-		return &YandexDisk{IsAvailible: false}, nil
+		return &YandexDisk{isAvailible: false}, nil
 	}
 	yaDisk, err := yadisk.NewYaDisk(context.Background(), http.DefaultClient, &yadisk.Token{AccessToken: token})
 	if err != nil {
 		return nil, err
 	}
-	return &YandexDisk{disk: yaDisk, client: http.DefaultClient, IsAvailible: true}, nil
+	return &YandexDisk{disk: yaDisk, client: http.DefaultClient, isAvailible: true}, nil
 }
 
 func (y *YandexDisk) CreateFile(name string, data []byte) (string, error) {
@@ -48,4 +54,8 @@ func (y *YandexDisk) CreateFile(name string, data []byte) (string, error) {
 		return "", fmt.Errorf("%s get resource link error: %w", op, err)
 	}
 	return responseLink.Href, nil
+}
+
+func (y *YandexDisk) IsAvailible() bool {
+	return y.isAvailible
 }

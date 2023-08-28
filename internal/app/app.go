@@ -38,7 +38,7 @@ func App() {
 		log.Error("create yandex disk error", log.String("error", err.Error()))
 		return
 	}
-	if yandex.IsAvailible {
+	if yandex.IsAvailible() {
 		log.Debug("history service enable")
 	} else {
 		log.Debug("history service disable")

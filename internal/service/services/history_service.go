@@ -15,21 +15,21 @@ import (
 
 type HistoryService struct {
 	historyStorage storage.History
-	yandexDisk     *yandexdrive.YandexDisk
+	yandexDisk     yandexdrive.Disk
 }
 
 var (
 	ErrServiceUnavailible = errors.New("history service unavailible")
 )
 
-func NewHistoryService(historyStorage storage.History, yandexDisk *yandexdrive.YandexDisk) *HistoryService {
+func NewHistoryService(historyStorage storage.History, yandexDisk yandexdrive.Disk) *HistoryService {
 	return &HistoryService{historyStorage: historyStorage, yandexDisk: yandexDisk}
 }
 
 func (h *HistoryService) GetHistoryByDate(ctx context.Context, date string) (string, error) {
 	op := "internal.service.services.HistoryService.GetHistoryByDate"
 
-	if !h.yandexDisk.IsAvailible {
+	if !h.yandexDisk.IsAvailible() {
 		return "", ErrServiceUnavailible
 	}
 	history, err := h.historyStorage.GetHistoryByDate(ctx, date)
