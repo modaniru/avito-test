@@ -1,8 +1,9 @@
 package entity
 
 type Segment struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id     int     `json:"id"`
+	Name   string  `json:"name"`
+	Expire *string `json:"expire"`
 }
 
 type History struct {

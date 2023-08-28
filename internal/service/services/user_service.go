@@ -46,10 +46,10 @@ func (u *UserService) DeleteUser(ctx context.Context, id int) error {
 	return nil
 }
 
-func (u *UserService) FollowToSegments(ctx context.Context, userId int, segments []string) error {
+func (u *UserService) FollowToSegments(ctx context.Context, userId int, segments []string, date *string) error {
 	op := "internal.service.services.UserService.FollowToSegments"
 
-	err := u.userStorage.FollowToSegments(ctx, userId, segments)
+	err := u.userStorage.FollowToSegments(ctx, userId, segments, date)
 	if err != nil {
 		return fmt.Errorf("%s follow to segments error: %w", op, err)
 	}

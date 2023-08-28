@@ -85,7 +85,7 @@ func TestFollowSegments(t *testing.T) {
 	userStorage.On("FollowToSegments", mock.Anything, userId, segments).Return(nil).Once()
 
 	userService := NewUserService(userStorage)
-	err := userService.FollowToSegments(context.Background(), userId, segments)
+	err := userService.FollowToSegments(context.Background(), userId, segments, nil)
 	require.NoError(t, err)
 }
 
@@ -97,7 +97,7 @@ func TestFollowSegmentsWithError(t *testing.T) {
 	userStorage.On("FollowToSegments", mock.Anything, userId, segments).Return(errors.New("error")).Once()
 
 	userService := NewUserService(userStorage)
-	err := userService.FollowToSegments(context.Background(), userId, segments)
+	err := userService.FollowToSegments(context.Background(), userId, segments, nil)
 	require.Error(t, err)
 }
 

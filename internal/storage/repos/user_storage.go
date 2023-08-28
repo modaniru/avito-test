@@ -108,9 +108,9 @@ func (u *UserStorage) DeleteUser(ctx context.Context, userId int) error {
 	return nil
 }
 
-func (u *UserStorage) FollowToSegments(ctx context.Context, userId int, segments []string) error {
+func (u *UserStorage) FollowToSegments(ctx context.Context, userId int, segments []string, date *string) error {
 	op := "internal.storage.repos.UserStorage.FollowToSegments"
-	saveFollowQuery := "insert into follows (user_id, segment_id) values ($1, (select id from segments where name = $2));"
+	saveFollowQuery := "insert into follows (user_id, segment_id, expire) values ($1, (select id from segments where name = $2), $3);"
 	saveHistoryQuery := "insert into history (user_id, segment_name, operation) values ($1, $2, $3)"
 
 	err := u.SaveUser(ctx, userId)
@@ -127,7 +127,7 @@ func (u *UserStorage) FollowToSegments(ctx context.Context, userId int, segments
 
 	defer tx.Rollback()
 	for _, segment := range segments {
-		_, err = tx.ExecContext(ctx, saveFollowQuery, userId, segment)
+		_, err = tx.ExecContext(ctx, saveFollowQuery, userId, segment, date)
 		if err != nil {
 			if pqErr, ok := err.(*pq.Error); ok {
 				// Already exists
@@ -185,7 +185,7 @@ func (u *UserStorage) UnFollowToSegments(ctx context.Context, userId int, segmen
 
 func (u *UserStorage) GetUserSegments(ctx context.Context, id int) ([]entity.Segment, error) {
 	op := "internal.storage.repos.UserStorage.GetUserSegments"
-	query := "select s.id, s.name from follows as f inner join segments as s on f.segment_id = s.id where f.user_id = $1;"
+	query := "select s.id, s.name, f.expire from follows as f inner join segments as s on f.segment_id = s.id where f.user_id = $1;"
 	findUserQuery := "select id from users where id = $1;"
 
 	var userId int
@@ -206,7 +206,7 @@ func (u *UserStorage) GetUserSegments(ctx context.Context, id int) ([]entity.Seg
 	segments := make([]entity.Segment, 0)
 	for rows.Next() {
 		var segment entity.Segment
-		err := rows.Scan(&segment.Id, &segment.Name)
+		err := rows.Scan(&segment.Id, &segment.Name, &segment.Expire)
 		if err != nil {
 			return nil, fmt.Errorf("%s scan error: %w", op, err)
 		}

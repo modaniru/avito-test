@@ -52,13 +52,13 @@ func (_m *User) FollowRandomUsers(ctx context.Context, name string, percent floa
 	return r0, r1
 }
 
-// FollowToSegments provides a mock function with given fields: ctx, userId, segments
-func (_m *User) FollowToSegments(ctx context.Context, userId int, segments []string) error {
-	ret := _m.Called(ctx, userId, segments)
+// FollowToSegments provides a mock function with given fields: ctx, userId, segments, date
+func (_m *User) FollowToSegments(ctx context.Context, userId int, segments []string, date *string) error {
+	ret := _m.Called(ctx, userId, segments, date)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, int, []string) error); ok {
-		r0 = rf(ctx, userId, segments)
+	if rf, ok := ret.Get(0).(func(context.Context, int, []string, *string) error); ok {
+		r0 = rf(ctx, userId, segments, date)
 	} else {
 		r0 = ret.Error(0)
 	}

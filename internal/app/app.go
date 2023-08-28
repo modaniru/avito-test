@@ -43,11 +43,13 @@ func App() {
 	} else {
 		log.Debug("history service disable")
 	}
+	scheduler := service.NewScheduler(storage.Follow)
 	service := service.NewService(storage, yandex)
 	r := chi.NewRouter()
 	controller.NewRouter(r, service)
 	log.Debug("finish DI")
 	//TODO graceful shutdown
+	_ = scheduler.RunScheduler()
 	http.ListenAndServe(fmt.Sprintf(":%s", config.Port), r)
 
 }

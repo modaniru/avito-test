@@ -14,7 +14,7 @@ type User interface {
 	SaveUser(ctx context.Context, userId int) error
 	GetUsers(ctx context.Context) ([]entity.User, error)
 	DeleteUser(ctx context.Context, userId int) error
-	FollowToSegments(ctx context.Context, userId int, segments []string) error
+	FollowToSegments(ctx context.Context, userId int, segments []string, date *string) error
 	UnFollowToSegments(ctx context.Context, userId int, segments []string) error
 	GetUserSegments(ctx context.Context, id int) ([]entity.Segment, error)
 	FollowRandomUsers(ctx context.Context, name string, percent float64) (int, error)
@@ -33,10 +33,15 @@ type History interface {
 	GetHistoryByDate(ctx context.Context, date string) ([]entity.History, error)
 }
 
+type Follow interface {
+	DeleteExpiredFollows() (int, error)
+}
+
 type Storage struct {
 	User
 	Segment
 	History
+	Follow
 }
 
 func NewStorage(db *sql.DB) *Storage {
@@ -73,5 +78,6 @@ func NewStorage(db *sql.DB) *Storage {
 		User:    repos.NewUserStorage(db),
 		Segment: repos.NewSegmentStorage(db),
 		History: repos.NewHistoryStorage(db),
+		Follow:  repos.NewFollowStorage(db),
 	}
 }

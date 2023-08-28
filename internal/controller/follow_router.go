@@ -33,6 +33,7 @@ func NewFollowRouter(userService service.User) chi.Router {
 type FollowSegmentsInput struct {
 	UserId   int      `json:"user_id"`
 	Segments []string `json:"segments"`
+	Expire   *string  `json:"expire,omitempty"`
 }
 
 // TODO user not found or segment handle error
@@ -53,7 +54,14 @@ func (f *FollowRouter) FollowSegments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = f.userService.FollowToSegments(r.Context(), input.UserId, input.Segments)
+	err = validation.ValidateDate(*input.Expire)
+	if err != nil {
+		log.Error("validate date error", log.String("error", err.Error()))
+		writeError(w, http.StatusBadRequest, errors.New("validate date error"))
+		return
+	}
+
+	err = f.userService.FollowToSegments(r.Context(), input.UserId, input.Segments, input.Expire)
 
 	if err != nil {
 		if errors.Is(err, repos.ErrUserAlreadyHasThisSegment) {
