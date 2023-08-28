@@ -19,11 +19,25 @@ func NewHistoryRouter(historyService service.History) chi.Router {
 	h := HistoryRouter{historyService: historyService}
 	r := chi.NewRouter()
 
-	r.Get("/date", h.GetHistoryByDate)
+	r.Get("/", h.GetHistoryByDate)
 
 	return r
 }
 
+type GetHistoryResponse struct {
+	Link string `json:"link"`
+}
+
+// @Summary		get history
+// @Tags			history
+// @Description	Получить историю добавления/удаления сегментов у пользователя (ГГГГ-ММ-ДД или ГГГГ-ММ)
+// @Accept			json
+// @Produce		json
+// @Param			date	query		string	true	"get history by date YYYY-MM or YYYY-MM-DD"
+// @Success		200		{object}	GetHistoryResponse
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/history/ [get]
 func (h *HistoryRouter) GetHistoryByDate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	date := r.URL.Query().Get("date")
@@ -43,11 +57,7 @@ func (h *HistoryRouter) GetHistoryByDate(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	type historyResponse struct {
-		Link string `json:"link"`
-	}
-
-	b, err := json.Marshal(&historyResponse{Link: history})
+	b, err := json.Marshal(&GetHistoryResponse{Link: history})
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "marshal history error", err)
 		return

@@ -6,7 +6,9 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	_ "github.com/modaniru/avito/docs"
 	"github.com/modaniru/avito/internal/service"
+	"github.com/swaggo/http-swagger/v2"
 )
 
 func NewRouter(r chi.Router, service *service.Service) {
@@ -14,6 +16,9 @@ func NewRouter(r chi.Router, service *service.Service) {
 	r.Mount("/user", NewUserRouter(service.User))
 	r.Mount("/segment", NewSegmentRouter(service.Segment))
 	r.Mount("/history", NewHistoryRouter(service.History))
+	r.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:80/swagger/doc.json"), //The url pointing to API definition
+	))
 }
 
 type ErrorResponse struct {

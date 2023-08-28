@@ -23,7 +23,7 @@ func NewUserRouter(userService service.User) chi.Router {
 	r.Post("/", u.SaveUser)
 	r.Delete("/", u.DeleteUser)
 	r.Get("/all", u.GetUsers)
-	r.Mount("/segments", NewFollowRouter(userService))
+	r.Mount("/segment", NewFollowRouter(userService))
 	return r
 }
 
@@ -31,6 +31,16 @@ type SaveUserInput struct {
 	Id int `json:"id"`
 }
 
+// @Summary		save user id
+// @Tags			user
+// @Description	Сохранить пользователя
+// @Accept			json
+// @Produce		json
+// @Param			input	body	SaveUserInput	true	"user id"
+// @Success		201
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/user/ [post]
 func (u *UserRouter) SaveUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
@@ -63,6 +73,17 @@ type DeleteUserInput struct {
 	Id int `json:"id"`
 }
 
+// @Summary		delete user by id
+// @Tags			user
+// @Description	Удалить пользователя
+// @Accept			json
+// @Produce		json
+// @Param			input	body	DeleteUserInput	true	"user id"
+// @Success		204
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			404 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/user/ [delete]
 func (u *UserRouter) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
@@ -91,6 +112,15 @@ func (u *UserRouter) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// @Summary		get users
+// @Tags			user
+// @Description	Получить всех пользователей
+// @Accept			json
+// @Produce		json
+// @Success		200	{array}	entity.User
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/user/all [get]
 func (u *UserRouter) GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	users, err := u.userService.GetUsers(r.Context())

@@ -35,6 +35,16 @@ type FollowSegmentsInput struct {
 	Expire   *string  `json:"expire,omitempty"`
 }
 
+// @Summary		follow user to segment
+// @Tags			follow
+// @Description	Подписывает пользователя на сегмент(ы). Если пользователь до этого не был создан, создаст его с этими сегментами.
+// @Accept			json
+// @Produce		json
+// @Param			input	body	FollowSegmentsInput	true	"user_id, segments, expires (optional)"
+// @Success		201
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/user/segment/ [post]
 func (f *FollowRouter) FollowSegments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
@@ -79,7 +89,16 @@ type UnfollowSegmentsInput struct {
 	Segments []string `json:"segments"`
 }
 
-// TODO handle user or segment not found error
+// @Summary		unfollow user to segment
+// @Tags			follow
+// @Description	Отписывает сегмент(ы) у пользователя
+// @Accept			json
+// @Produce		json
+// @Param			input	body	UnfollowSegmentsInput	true	"user_id, segments"
+// @Success		204
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/user/segment/ [delete]
 func (f *FollowRouter) UnfollowSegments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
@@ -112,6 +131,16 @@ type GetUserSegmentsInput struct {
 	Id int `json:"id"`
 }
 
+// @Summary		get user's segments
+// @Tags			follow
+// @Description	Получить все сегменты пользователя
+// @Accept			json
+// @Produce		json
+// @Param			input	body	GetUserSegmentsInput	true	"user_id"
+// @Success		200		{array}	entity.Follows
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/user/segment/ [get]
 func (f *FollowRouter) GetUserSegments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
@@ -150,6 +179,20 @@ type RandomFollowInput struct {
 	Percent float64 `json:"percent"`
 }
 
+type RandomFollowResponse struct {
+	RowsAffected int `json:"rows_affected"`
+}
+
+// @Summary		set segment for X% users
+// @Tags			follow
+// @Description	Подписывает X% пользователей на сегмент.
+// @Accept			json
+// @Produce		json
+// @Param			input	body		RandomFollowInput	true	"name, percent"
+// @Success		201		{object}	RandomFollowResponse
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/user/segment/auto [post]
 func (f *FollowRouter) RandomFollow(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
@@ -182,10 +225,6 @@ func (f *FollowRouter) RandomFollow(w http.ResponseWriter, r *http.Request) {
 		}
 		writeError(w, http.StatusInternalServerError, "follow to segments error", err)
 		return
-	}
-
-	type RandomFollowResponse struct {
-		RowsAffected int `json:"rows_affected"`
 	}
 
 	b, err = json.Marshal(&RandomFollowResponse{RowsAffected: rowsAffected})

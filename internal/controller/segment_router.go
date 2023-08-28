@@ -31,6 +31,20 @@ type SaveSegmentInput struct {
 	Name string `json:"name"`
 }
 
+type SaveSegmentResponse struct {
+	Id int `json:"id"`
+}
+
+// @Summary		save segment
+// @Tags			segment
+// @Description	Сохранить сегмент
+// @Accept			json
+// @Produce		json
+// @Param			input	body		SaveSegmentInput	true	"segment name"
+// @Success		201		{object}	SaveSegmentResponse
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/segment/ [post]
 func (s *SegmentRouter) SaveSegment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
@@ -61,10 +75,7 @@ func (s *SegmentRouter) SaveSegment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type response struct {
-		Id int `json:"id"`
-	}
-	b, err = json.Marshal(response{Id: id})
+	b, err = json.Marshal(SaveSegmentResponse{Id: id})
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "marshal users error", err)
 		return
@@ -78,6 +89,17 @@ type DeleteSegmentInput struct {
 	Name string `json:"name"`
 }
 
+// @Summary		delete segment by name
+// @Tags			segment
+// @Description	Удалить сегмент по его имени
+// @Accept			json
+// @Produce		json
+// @Param			input	body	DeleteSegmentInput	true	"segment name"
+// @Success		204
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			404 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/segment/ [delete]
 func (s *SegmentRouter) DeleteSegment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	b, err := io.ReadAll(r.Body)
@@ -106,6 +128,15 @@ func (s *SegmentRouter) DeleteSegment(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// @Summary		get segments
+// @Tags			segment
+// @Description	Получить все сегменты
+// @Accept			json
+// @Produce		json
+// @Success		200	{array}	entity.Segment
+// @Falure			400 {object} ErrorResponse 1
+// @Falure			500 {object} ErrorResponse 1
+// @Router			/segment/all [get]
 func (s *SegmentRouter) GetSegments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	segments, err := s.segmentService.GetSegments(r.Context())

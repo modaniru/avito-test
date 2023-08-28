@@ -1,0 +1,319 @@
+basePath: /
+definitions:
+  controller.DeleteSegmentInput:
+    properties:
+      name:
+        type: string
+    type: object
+  controller.DeleteUserInput:
+    properties:
+      id:
+        type: integer
+    type: object
+  controller.FollowSegmentsInput:
+    properties:
+      expire:
+        type: string
+      segments:
+        items:
+          type: string
+        type: array
+      user_id:
+        type: integer
+    type: object
+  controller.GetHistoryResponse:
+    properties:
+      link:
+        type: string
+    type: object
+  controller.GetUserSegmentsInput:
+    properties:
+      id:
+        type: integer
+    type: object
+  controller.RandomFollowInput:
+    properties:
+      name:
+        type: string
+      percent:
+        type: number
+    type: object
+  controller.RandomFollowResponse:
+    properties:
+      rows_affected:
+        type: integer
+    type: object
+  controller.SaveSegmentInput:
+    properties:
+      name:
+        type: string
+    type: object
+  controller.SaveSegmentResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  controller.SaveUserInput:
+    properties:
+      id:
+        type: integer
+    type: object
+  controller.UnfollowSegmentsInput:
+    properties:
+      segments:
+        items:
+          type: string
+        type: array
+      user_id:
+        type: integer
+    type: object
+  entity.Follows:
+    properties:
+      expire:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  entity.Segment:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  entity.User:
+    properties:
+      id:
+        type: integer
+    type: object
+host: localhost:80
+info:
+  contact: {}
+  description: Авито тестовое задание
+  title: Avito Test Task
+  version: "1.0"
+paths:
+  /history/:
+    get:
+      consumes:
+      - application/json
+      description: Получить историю добавления/удаления сегментов у пользователя (ГГГГ-ММ-ДД
+        или ГГГГ-ММ)
+      parameters:
+      - description: get history by date YYYY-MM or YYYY-MM-DD
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.GetHistoryResponse'
+      summary: get history
+      tags:
+      - history
+  /segment/:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить сегмент по его имени
+      parameters:
+      - description: segment name
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controller.DeleteSegmentInput'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: delete segment by name
+      tags:
+      - segment
+    post:
+      consumes:
+      - application/json
+      description: Сохранить сегмент
+      parameters:
+      - description: segment name
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controller.SaveSegmentInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.SaveSegmentResponse'
+      summary: save segment
+      tags:
+      - segment
+  /segment/all:
+    get:
+      consumes:
+      - application/json
+      description: Получить все сегменты
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Segment'
+            type: array
+      summary: get segments
+      tags:
+      - segment
+  /user/:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить пользователя
+      parameters:
+      - description: user id
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controller.DeleteUserInput'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: delete user by id
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: Сохранить пользователя
+      parameters:
+      - description: user id
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controller.SaveUserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: save user id
+      tags:
+      - user
+  /user/all:
+    get:
+      consumes:
+      - application/json
+      description: Получить всех пользователей
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.User'
+            type: array
+      summary: get users
+      tags:
+      - user
+  /user/segment/:
+    delete:
+      consumes:
+      - application/json
+      description: Отписывает сегмент(ы) у пользователя
+      parameters:
+      - description: user_id, segments
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controller.UnfollowSegmentsInput'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: unfollow user to segment
+      tags:
+      - follow
+    get:
+      consumes:
+      - application/json
+      description: Получить все сегменты пользователя
+      parameters:
+      - description: user_id
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controller.GetUserSegmentsInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Follows'
+            type: array
+      summary: get user's segments
+      tags:
+      - follow
+    post:
+      consumes:
+      - application/json
+      description: Подписывает пользователя на сегмент(ы). Если пользователь до этого
+        не был создан, создаст его с этими сегментами.
+      parameters:
+      - description: user_id, segments, expires (optional)
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controller.FollowSegmentsInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: follow user to segment
+      tags:
+      - follow
+  /user/segment/auto:
+    post:
+      consumes:
+      - application/json
+      description: Подписывает X% пользователей на сегмент.
+      parameters:
+      - description: name, percent
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RandomFollowInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.RandomFollowResponse'
+      summary: set segment for X% users
+      tags:
+      - follow
+swagger: "2.0"
