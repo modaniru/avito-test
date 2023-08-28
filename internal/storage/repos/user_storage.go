@@ -113,6 +113,13 @@ func (u *UserStorage) FollowToSegments(ctx context.Context, userId int, segments
 	saveFollowQuery := "insert into follows (user_id, segment_id) values ($1, (select id from segments where name = $2));"
 	saveHistoryQuery := "insert into history (user_id, segment_name, operation) values ($1, $2, $3)"
 
+	err := u.SaveUser(ctx, userId)
+	if err != nil {
+		if !errors.Is(err, ErrUserAlreadyExists) {
+			return err
+		}
+	}
+
 	tx, err := u.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("%s begin tx error: %w", op, err)
@@ -126,8 +133,8 @@ func (u *UserStorage) FollowToSegments(ctx context.Context, userId int, segments
 				// Already exists
 				if pqErr.Code == "23505" {
 					return ErrUserAlreadyHasThisSegment
-				} else if pqErr.Code == "23503" || pqErr.Code == "23502" { //foreign key not present or segment_id equals null
-					return ErrUserOrSegmentNotExists
+				} else if pqErr.Code == "23503" || pqErr.Code == "23502" {
+					return ErrSegmentNotFound
 				}
 			}
 			return fmt.Errorf("%s exec error: %w", op, err)

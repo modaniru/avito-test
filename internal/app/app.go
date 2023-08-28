@@ -31,7 +31,6 @@ func App() {
 		return
 	}
 	log.Debug("database successfully load")
-	// TODO возможность не иметь ручки истории
 	log.Debug("start DI...")
 	storage := storage.NewStorage(db)
 	yandex, err := yandexdrive.NewYandexDisk(config.YandexToken)
@@ -39,11 +38,16 @@ func App() {
 		log.Error("create yandex disk error", log.String("error", err.Error()))
 		return
 	}
+	if yandex.IsAvailible {
+		log.Debug("history service enable")
+	} else {
+		log.Debug("history service disable")
+	}
 	service := service.NewService(storage, yandex)
 	r := chi.NewRouter()
 	controller.NewRouter(r, service)
 	log.Debug("finish DI")
-
+	//TODO graceful shutdown
 	http.ListenAndServe(fmt.Sprintf(":%s", config.Port), r)
 
 }
