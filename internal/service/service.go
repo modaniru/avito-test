@@ -26,7 +26,6 @@ type Segment interface {
 }
 
 type History interface {
-	GetHistory(ctx context.Context) ([]entity.History, error)
 	GetHistoryByDate(ctx context.Context, date string) (string, error)
 }
 

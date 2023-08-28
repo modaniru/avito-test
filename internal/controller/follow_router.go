@@ -49,11 +49,12 @@ func (f *FollowRouter) FollowSegments(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "unmarshal body error", err)
 		return
 	}
-
-	err = validation.ValidateDate(*input.Expire)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, "validate date error", err)
-		return
+	if input.Expire != nil {
+		err = validation.ValidateDate(*input.Expire)
+		if err != nil {
+			writeError(w, http.StatusBadRequest, "validate date error", err)
+			return
+		}
 	}
 
 	err = f.userService.FollowToSegments(r.Context(), input.UserId, input.Segments, input.Expire)

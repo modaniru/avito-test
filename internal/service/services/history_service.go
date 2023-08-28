@@ -26,16 +26,6 @@ func NewHistoryService(historyStorage storage.History, yandexDisk *yandexdrive.Y
 	return &HistoryService{historyStorage: historyStorage, yandexDisk: yandexDisk}
 }
 
-func (h *HistoryService) GetHistory(ctx context.Context) ([]entity.History, error) {
-	op := "internal.service.services.HistoryService.GetHistory"
-
-	history, err := h.historyStorage.GetHistory(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("%s get history error: %w", op, err)
-	}
-	return history, nil
-}
-
 func (h *HistoryService) GetHistoryByDate(ctx context.Context, date string) (string, error) {
 	op := "internal.service.services.HistoryService.GetHistoryByDate"
 

@@ -1,4 +1,4 @@
-package services
+package services_test
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/modaniru/avito/internal/entity"
+	"github.com/modaniru/avito/internal/service/services"
 	"github.com/modaniru/avito/internal/storage/mocks"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -13,7 +14,7 @@ import (
 
 func TestSaveSegment(t *testing.T) {
 	segmentStorage := mocks.NewSegment(t)
-	segmentService := NewSegmentService(segmentStorage)
+	segmentService := services.NewSegmentService(segmentStorage)
 
 	segmentName := "segment_name"
 	returningId := 1
@@ -26,7 +27,7 @@ func TestSaveSegment(t *testing.T) {
 
 func TestSaveSegmentWithError(t *testing.T) {
 	segmentStorage := mocks.NewSegment(t)
-	segmentService := NewSegmentService(segmentStorage)
+	segmentService := services.NewSegmentService(segmentStorage)
 
 	segmentName := "segment_name"
 	segmentStorage.On("SaveSegment", mock.Anything, segmentName).Once().Return(0, errors.New("test"))
@@ -37,7 +38,7 @@ func TestSaveSegmentWithError(t *testing.T) {
 
 func TestGetSegments(t *testing.T) {
 	segmentStorage := mocks.NewSegment(t)
-	segmentService := NewSegmentService(segmentStorage)
+	segmentService := services.NewSegmentService(segmentStorage)
 
 	excepted := []entity.Segment{{Id: 1, Name: "segment_1"}, {Id: 2, Name: "segment_2"}}
 	segmentStorage.On("GetSegments", mock.Anything).Once().Return(excepted, nil)
@@ -49,7 +50,7 @@ func TestGetSegments(t *testing.T) {
 
 func TestGetSegmentsWithError(t *testing.T) {
 	segmentStorage := mocks.NewSegment(t)
-	segmentService := NewSegmentService(segmentStorage)
+	segmentService := services.NewSegmentService(segmentStorage)
 
 	segmentStorage.On("GetSegments", mock.Anything).Once().Return(nil, errors.New("error"))
 
@@ -60,7 +61,7 @@ func TestGetSegmentsWithError(t *testing.T) {
 
 func TestDeleteSegment(t *testing.T) {
 	segmentStorage := mocks.NewSegment(t)
-	segmentService := NewSegmentService(segmentStorage)
+	segmentService := services.NewSegmentService(segmentStorage)
 
 	segmentName := "segment_name"
 	segmentStorage.On("DeleteSegment", mock.Anything, segmentName).Once().Return(nil)
@@ -71,7 +72,7 @@ func TestDeleteSegment(t *testing.T) {
 
 func TestDeleteSegmentWithError(t *testing.T) {
 	segmentStorage := mocks.NewSegment(t)
-	segmentService := NewSegmentService(segmentStorage)
+	segmentService := services.NewSegmentService(segmentStorage)
 
 	segmentName := "segment_name"
 	segmentStorage.On("DeleteSegment", mock.Anything, segmentName).Once().Return(errors.New("test"))
