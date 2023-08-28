@@ -10,6 +10,7 @@ services:
       DB_HOST: "db"
       LOG_LEVEL: "${LOG_LEVEL}"
       YANDEX_TOKEN: "${YANDEX_TOKEN}"
+      PORT: "${PORT}"
     ports:
         - "80:${PORT}"
     restart: always

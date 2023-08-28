@@ -48,6 +48,7 @@ func App() {
 	r := chi.NewRouter()
 	controller.NewRouter(r, service)
 	log.Debug("finish DI")
+	log.Info("run server in " + config.Port + " port")
 	//TODO graceful shutdown
 	_ = scheduler.RunScheduler()
 	http.ListenAndServe(fmt.Sprintf(":%s", config.Port), r)
