@@ -288,19 +288,20 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:80/history/date?date=2023-08-31",
+					"raw": "localhost:80/history/?date=2023-08-31",
 					"host": [
 						"localhost"
 					],
 					"port": "80",
 					"path": [
 						"history",
-						"date"
+						""
 					],
 					"query": [
 						{
 							"key": "date",
-							"value": "2023-08-31"
+							"value": "2023-08-31",
+							"description": "ГГГГ-ММ-ДД или ГГГГ-ММ"
 						}
 					]
 				},

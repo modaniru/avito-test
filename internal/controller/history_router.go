@@ -37,6 +37,7 @@ type GetHistoryResponse struct {
 // @Success		200		{object}	GetHistoryResponse
 // @Falure			400 {object} ErrorResponse 1
 // @Falure			500 {object} ErrorResponse 1
+// @Falure			503 {object} ErrorResponse 1
 // @Router			/history/ [get]
 func (h *HistoryRouter) GetHistoryByDate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
@@ -50,7 +51,7 @@ func (h *HistoryRouter) GetHistoryByDate(w http.ResponseWriter, r *http.Request)
 	history, err := h.historyService.GetHistoryByDate(r.Context(), date)
 	if err != nil {
 		if errors.Is(err, services.ErrServiceUnavailible) {
-			writeError(w, http.StatusBadRequest, "history service is unavailible", err)
+			writeError(w, http.StatusServiceUnavailable, "history service is unavailible", err)
 			return
 		}
 		writeError(w, http.StatusInternalServerError, "get history error", err)
