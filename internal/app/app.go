@@ -49,8 +49,20 @@ func App() {
 	controller.NewRouter(r, service)
 	log.Debug("finish DI")
 	log.Info("run server in " + config.Port + " port")
-	//TODO graceful shutdown
-	_ = scheduler.RunScheduler()
-	http.ListenAndServe(fmt.Sprintf(":%s", config.Port), r)
 
+	channel := scheduler.RunScheduler()
+	go func() {
+		err := http.ListenAndServe(fmt.Sprintf(":%s", config.Port), r)
+		if err != nil {
+			log.Error("start http server error")
+			channel <- 2
+		}
+	}()
+	c := <-channel
+
+	if c == 1 {
+		log.Error("start scheduller error")
+	} else {
+		log.Error("error")
+	}
 }
