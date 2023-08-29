@@ -11,9 +11,9 @@ COPY go.mod .
 COPY go.sum .
 
 RUN go get ./...
-RUN go build -o main cmd/main.go
+RUN CGO_ENABLED=0 go build -o main cmd/main.go
 
-FROM ubuntu:latest
+FROM centos:latest
 
 COPY --from=builder /app/main .
 
