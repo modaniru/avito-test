@@ -232,6 +232,6 @@ func (f *FollowRouter) RandomFollow(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "marshal RandomFollowResponse error", err)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	w.Write(b)
 }
