@@ -182,3 +182,8 @@ curl --location --request GET 'localhost:80/user/segment/' \
 curl --location 'localhost:80/history/?date=2023-08-31'
 ~~~
 ---
+## Архитектура и возникшие вопросы
+### архитектура базы данных
+![Схема бд](files/Untitled.svg)
+## Screenshots  
+![App Screenshot](https://lanecdr.org/wp-content/uploads/2019/08/placeholder.png)  
