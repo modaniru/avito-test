@@ -1,10 +1,15 @@
 package app
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	log "log/slog"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/go-chi/chi"
 	_ "github.com/lib/pq"
@@ -47,22 +52,33 @@ func App() {
 	service := service.NewService(storage, yandex)
 	r := chi.NewRouter()
 	controller.NewRouter(r, service)
+	srv := http.Server{
+		Handler:      r,
+		Addr:         fmt.Sprintf(":%s", config.Port),
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
 	log.Debug("finish DI")
-	log.Info("run server in " + config.Port + " port")
-
+	log.Info("run scheduler...")
 	channel := scheduler.RunScheduler()
 	go func() {
-		err := http.ListenAndServe(fmt.Sprintf(":%s", config.Port), r)
+		log.Info("run server in " + config.Port + " port...")
+		err := srv.ListenAndServe()
 		if err != nil {
-			log.Error("start http server error")
-			channel <- 2
+			log.Error("error", log.String("error", err.Error()))
+			os.Exit(1)
 		}
 	}()
-	c := <-channel
 
-	if c == 1 {
-		log.Error("start scheduller error")
-	} else {
-		log.Error("error")
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+
+	select {
+	case <-quit:
+		log.Info("shutdown server")
+		srv.Shutdown(context.Background())
+	case <-channel:
+		srv.Shutdown(context.Background())
+		log.Error("scheduler error")
 	}
 }
